@@ -13,7 +13,6 @@ if st.button("🔄 Nova Consulta"):
     st.session_state.clear()
     st.rerun()
 
-
 # =============================
 # UPLOAD PREVISÃO
 # =============================
@@ -102,7 +101,7 @@ if calcular and arquivo_prev and arquivo_folha:
     df_mensal.rename(columns={'VALOR_CALCULADO_PERCENTUAL': 'Valor Mensal'}, inplace=True)
 
     # =============================
-    # ORDENAÇÃO POR MÊS CORRETO
+    # ORDENAÇÃO POR MÊS
     # =============================
     df_mensal['MES_NUM'] = df_mensal['Competência'].apply(get_mes_num)
 
@@ -114,6 +113,15 @@ if calcular and arquivo_prev and arquivo_folha:
         df_mensal['Valor Mensal'] * df_mensal['Meses Restantes']
     )
 
+    # =============================
+    # PATRONAL E IMPACTO
+    # =============================
+    df_mensal['Patronal Mês'] = df_mensal['Valor Mensal'] * 0.28
+    df_mensal['Patronal Ano'] = df_mensal['Valor Anual Previsto'] * 0.28
+
+    df_mensal['Impacto Mês'] = df_mensal['Valor Mensal'] + df_mensal['Patronal Mês']
+    df_mensal['Impacto Ano'] = df_mensal['Valor Anual Previsto'] + df_mensal['Patronal Ano']
+
     # Ordenar
     df_mensal = df_mensal.sort_values(by=['MES_NUM', 'Nome Funcionário'])
 
@@ -124,15 +132,29 @@ if calcular and arquivo_prev and arquivo_folha:
         'Nome Funcionário',
         'Cargo',
         'Valor Mensal',
-        'Valor Anual Previsto'
+        'Valor Anual Previsto',
+        'Patronal Mês',
+        'Patronal Ano',
+        'Impacto Mês',
+        'Impacto Ano'
     ]]
 
     # =============================
-    # FORMATAR PARA EXIBIÇÃO
+    # EXIBIÇÃO FORMATADA
     # =============================
     df_exibicao = df_final.copy()
-    df_exibicao['Valor Mensal'] = df_exibicao['Valor Mensal'].map("R$ {:,.2f}".format)
-    df_exibicao['Valor Anual Previsto'] = df_exibicao['Valor Anual Previsto'].map("R$ {:,.2f}".format)
+
+    colunas_valores = [
+        'Valor Mensal',
+        'Valor Anual Previsto',
+        'Patronal Mês',
+        'Patronal Ano',
+        'Impacto Mês',
+        'Impacto Ano'
+    ]
+
+    for col in colunas_valores:
+        df_exibicao[col] = df_exibicao[col].map("R$ {:,.2f}".format)
 
     st.success("✅ Cálculo realizado com sucesso!")
     st.dataframe(df_exibicao, use_container_width=True)
@@ -151,7 +173,7 @@ if calcular and arquivo_prev and arquivo_folha:
 
             formato_moeda = workbook.add_format({'num_format': 'R$ #,##0.00'})
 
-            worksheet.set_column('F:G', 18, formato_moeda)
+            worksheet.set_column('F:K', 18, formato_moeda)
             worksheet.set_column('A:E', 20)
 
         return output.getvalue()
