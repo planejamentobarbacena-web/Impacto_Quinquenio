@@ -154,7 +154,9 @@ if calcular and arquivo_prev and arquivo_folha:
     ]
 
     for col in colunas_valores:
-        df_exibicao[col] = df_exibicao[col].map("R$ {:,.2f}".format)
+        df_exibicao[col] = df_exibicao[col].apply(
+        lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+)
 
     st.success("✅ Cálculo realizado com sucesso!")
     st.dataframe(df_exibicao, use_container_width=True)
