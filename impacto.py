@@ -17,7 +17,7 @@ if st.button("🔄 Nova Consulta"):
 # UPLOAD PREVISÃO
 # =============================
 st.markdown(
-    "<h3 style='margin-bottom:5px;'>📁 Upload - PREVISAO QUINQUENIO</h3>",
+    "<h3 style='margin-bottom:5px;'>📁 Upload - PREVISAO QUINQUENIO - PROGRESSAO</h3>",
     unsafe_allow_html=True
 )
 arquivo_prev = st.file_uploader("Selecione o arquivo", type=["xlsx"], key="prev")
